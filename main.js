@@ -1,5 +1,5 @@
 //================================================================
-// 1. SETUP DASAR (Sama seperti sebelumnya)
+// 1. SETUP DASAR
 //================================================================
 const canvas = document.querySelector('canvas.webgl');
 const scene = new THREE.Scene();
@@ -18,16 +18,9 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 
 //================================================================
-// 2. MEMBUAT PARTIKEL (PENGGANTI KUBUUS)
+// 2. MEMBUAT PARTIKEL BERBENTUK HATI
 //================================================================
 
-// Hapus atau beri komentar kode kubus lama
-// const geometry = new THREE.BoxGeometry(1, 1, 1);
-// const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-// const cube = new THREE.Mesh(geometry, material);
-// scene.add(cube);
-
-// TAMBAHKAN BAGIAN INI
 // Geometry untuk partikel
 const particlesGeometry = new THREE.BufferGeometry();
 const count = 20000; // Jumlah partikel yang kita inginkan
@@ -42,13 +35,32 @@ for (let i = 0; i < count * 3; i++) {
 // Menetapkan atribut posisi pada geometry
 particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
+// Fungsi untuk membuat tekstur hati untuk setiap partikel
+function createHeartTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const context = canvas.getContext('2d');
+    
+    context.fillStyle = 'white';
+    context.font = '64px sans-serif';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('♥', 32, 32); // Menggunakan karakter hati
+
+    const texture = new THREE.Texture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+}
+
 // Material untuk partikel
 const particlesMaterial = new THREE.PointsMaterial({
-    size: 0.02, // Ukuran setiap partikel
+    size: 0.05, // Ukuran setiap partikel hati
     sizeAttenuation: true, // Partikel yang jauh akan terlihat lebih kecil
     color: 0xffffff, // Warna partikel (putih)
     transparent: true, // Aktifkan transparansi
-    blending: THREE.AdditiveBlending // EFEK PENTING: Membuat partikel yang bertumpuk jadi lebih terang (efek glow)
+    blending: THREE.AdditiveBlending, // Efek glow saat bertumpuk
+    alphaMap: createHeartTexture() // Menggunakan tekstur hati yang kita buat
 });
 
 // Membuat objek Points (gabungan geometry dan material)
@@ -57,16 +69,15 @@ scene.add(particles); // Menambahkan partikel ke scene
 
 
 //================================================================
-// 3. ANIMATION LOOP (DENGAN SEDIKIT MODIFIKASI)
+// 3. ANIMATION LOOP
 //================================================================
 
-// Kita tambahkan objek jam untuk animasi yang lebih konsisten
+// Objek jam untuk animasi yang lebih konsisten
 const clock = new THREE.Clock();
 
 const tick = () => {
     const elapsedTime = clock.getElapsedTime();
 
-    // UBAH BAGIAN INI: Animasikan partikel
     // Membuat seluruh partikel berputar perlahan
     particles.rotation.y = elapsedTime * 0.1;
 
@@ -78,3 +89,21 @@ const tick = () => {
 };
 
 tick();
+
+
+//================================================================
+// 4. MENANGANI RESIZE WINDOW
+//================================================================
+window.addEventListener('resize', () => {
+    // Update ukuran
+    sizes.width = window.innerWidth;
+    sizes.height = window.innerHeight;
+
+    // Update aspect ratio kamera
+    camera.aspect = sizes.width / sizes.height;
+    camera.updateProjectionMatrix();
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
