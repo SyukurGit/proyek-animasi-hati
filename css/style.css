@@ -1,0 +1,19 @@
+/* Menghapus margin dan padding default dari browser */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #000000; /* Latar belakang hitam pekat */
+    overflow: hidden; /* Mencegah munculnya scrollbar */
+}
+
+/* Mengatur posisi dan ukuran kanvas kita */
+.webgl {
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
